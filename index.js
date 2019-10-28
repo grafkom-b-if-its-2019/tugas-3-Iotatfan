@@ -9,10 +9,13 @@
     // Inisialisasi shaders dan program
     var vertexShader = glUtils.getShader(gl, gl.VERTEX_SHADER, glUtils.SL.Shaders.v1.vertex);
     var fragmentShader = glUtils.getShader(gl, gl.FRAGMENT_SHADER, glUtils.SL.Shaders.v1.fragment);
+    var vertexShader2 = glUtils.getShader(gl, gl.VERTEX_SHADER, glUtils.SL.Shaders.v3.vertex);
+    var fragmentShader2 = glUtils.getShader(gl, gl.FRAGMENT_SHADER, glUtils.SL.Shaders.v3.fragment);
     var vertexShaderCube = glUtils.getShader(gl, gl.VERTEX_SHADER, glUtils.SL.Shaders.v2.vertex);
     var fragmentShaderCube = glUtils.getShader(gl, gl.FRAGMENT_SHADER, glUtils.SL.Shaders.v2.fragment);
 
     var program = glUtils.createProgram(gl, vertexShader, fragmentShader);
+    var program2 = glUtils.createProgram(gl, vertexShader2, fragmentShader2);
     var programCube = glUtils.createProgram(gl, vertexShaderCube, fragmentShaderCube);
 
     //For Triangles
@@ -26,6 +29,18 @@
     var vecY = 0.0076;
     var vecZ = 0.011;
     var nrp = 0.67;
+
+    //For Lines
+    var thetaLocL = gl.getUniformLocation(program2, 'theta'); 
+    var transLocL = gl.getUniformLocation(program2, 'vec');
+    var sizeLocL = gl.getUniformLocation(program2, 'size');
+    var sizeL = 0.2;
+    var thetaL = [20, 60, 0];
+    var vec2 = [0, 0, 0];
+    var vec2X = -0.006;
+    var vec2Y = 0.009;
+    var vec2Z = 0.021;
+
   
     //For Cube
     var thetaLocCube = gl.getUniformLocation(programCube, 'theta');
@@ -170,6 +185,87 @@
       gl.uniform3fv(thetaLoc, thetaT);
     }
 
+    function lines(){
+      gl.useProgram(program2);
+
+      var lineVertices = [
+        //x,y         r,g,b
+        -0.3, -0.7,   0.1,1.0,0.6,
+        0.0, 0.5,     1.0,1.0,0.0,
+
+        -0.2, -0.7,   0.1,1.0,0.6,
+        -0.155, -0.5, 0.1,1.0,0.6,
+
+        -0.12, -0.35, 0.1,1.0,0.6,
+        0.0, 0.2,     0.1,1.0,0.6,
+
+        -0.3, -0.7,   0.1,1.0,0.6,
+        -0.2, -0.7,   0.1,1.0,0.6,
+
+        0.0, -0.5,    0.1,1.0,0.6,
+        -0.155, -0.5, 0.1,1.0,0.6,
+
+        0.0, -0.35,   0.1,1.0,0.6,
+        -0.12, -0.35, 0.1,1.0,0.6,
+
+        0.0, 0.5,     0.1,1.0,0.6,
+        0.0, -0.7,    0.1,1.0,0.6,
+
+        0.0, -0.7,    0.1,1.0,0.6,
+        0.1, -0.7,    0.1,1.0,0.6,
+
+        0.0, 0.5,     1.0,1.0,0.6,
+        0.1, 0.5,     0.1,1.0,0.6,
+
+        0.1, -0.7,    0.1,1.0,0.6,
+        0.1, 0.5,     0.1,1.0,0.6
+      ];
+
+      var lineVertexBufferObject = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, lineVertexBufferObject);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(lineVertices), gl.STATIC_DRAW);
+
+      var vPosition = gl.getAttribLocation(program2, 'vPosition');
+      var vColor = gl.getAttribLocation(program2, 'vColor');
+
+      gl.vertexAttribPointer(
+        vPosition, 2, gl.FLOAT, gl.FALSE, 5 * Float32Array.BYTES_PER_ELEMENT, 0
+      );
+      gl.vertexAttribPointer(
+        vColor, 3, gl.FLOAT, gl.FALSE, 5 * Float32Array.BYTES_PER_ELEMENT, 2 * Float32Array.BYTES_PER_ELEMENT
+      );
+    
+      gl.uniform1f(sizeLocL, sizeL);
+
+      //Hit the Wall
+
+      if(vec2[0] > 0.5*(1-sizeL) || vec2[0] < -0.5*(1-sizeL) ){
+        vec2X = vec2X * -1;
+      }
+      vec2[0] += vec2X;
+
+      if(vec2[1] > 0.5*(1-sizeL) || vec2[1] < -0.5*(1-sizeL) ){
+        vec2Y = vec2Y * -1;
+      }
+      vec2[1] += vec2Y;
+
+      if(vec2[2] > 0.5*(1-sizeL) || vec2[2] < -0.5*(1-sizeL) ){
+        vec2Z = vec2Z * -1;
+      }
+      vec2[2] += vec2Z;
+
+      gl.uniform3fv(transLocL, vec2);
+
+      // gl.enableVertexAttribArray(vPosition);
+      // gl.enableVertexAttribArray(vColor);
+
+      //Y Rotation
+
+      thetaL[1] += ( nrp * 3 );
+
+      gl.uniform3fv(thetaLocL, thetaL);
+    }
+
     function render() {
       // Bersihkan layar jadi hitam
       gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -180,6 +276,9 @@
       
       triangle();
       gl.drawArrays(gl.TRIANGLES, 0, 15);
+
+      lines();
+      gl.drawArrays(gl.LINES, 0, 20);
 
       cube();
       gl.drawArrays(gl.LINES, 0, 24);
