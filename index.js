@@ -23,7 +23,7 @@
     var transLoc = gl.getUniformLocation(program, 'vec');
     var sizeLoc = gl.getUniformLocation(program, 'size');
     var size = 0.2;
-    var thetaT = [20, 60, 0];
+    var thetaT = [30, 60, 0];
     var vec = [0, 0, 0];
     var vecX = 0.0067;
     var vecY = 0.0076;
@@ -35,16 +35,16 @@
     var transLocL = gl.getUniformLocation(program2, 'vec');
     var sizeLocL = gl.getUniformLocation(program2, 'size');
     var sizeL = 0.2;
-    var thetaL = [20, 60, 0];
+    var thetaL = [30, 60, 0];
     var vec2 = [0, 0, 0];
     var vec2X = -0.006;
-    var vec2Y = 0.009;
+    var vec2Y = -0.009;
     var vec2Z = 0.021;
 
   
     //For Cube
     var thetaLocCube = gl.getUniformLocation(programCube, 'theta');
-    var thetaCube = [20, 60, 0];
+    var thetaCube = [30, 60, 0];
 
     function cube(){
       gl.useProgram(programCube);
@@ -110,7 +110,6 @@
       gl.enableVertexAttribArray(vColor);
 
       gl.uniform3fv(thetaLocCube, thetaCube);
-
     }
 
     function triangle(){
