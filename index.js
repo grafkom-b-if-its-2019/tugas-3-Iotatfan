@@ -9,20 +9,27 @@
     // Inisialisasi shaders dan program
     var vertexShader = glUtils.getShader(gl, gl.VERTEX_SHADER, glUtils.SL.Shaders.v1.vertex);
     var fragmentShader = glUtils.getShader(gl, gl.FRAGMENT_SHADER, glUtils.SL.Shaders.v1.fragment);
-    var vertexShaderCube = glUtils.getShader(gl, gl.VERTEX_SHADER, glUtils.SL.Shaders.v3.vertex);
-    var fragmentShaderCube = glUtils.getShader(gl, gl.FRAGMENT_SHADER, glUtils.SL.Shaders.v3.fragment);
+    var vertexShaderCube = glUtils.getShader(gl, gl.VERTEX_SHADER, glUtils.SL.Shaders.v2.vertex);
+    var fragmentShaderCube = glUtils.getShader(gl, gl.FRAGMENT_SHADER, glUtils.SL.Shaders.v2.fragment);
 
     var program = glUtils.createProgram(gl, vertexShader, fragmentShader);
     var programCube = glUtils.createProgram(gl, vertexShaderCube, fragmentShaderCube);
 
     //For Triangles
     var thetaLoc = gl.getUniformLocation(program, 'theta'); 
+    var transLoc = gl.getUniformLocation(program, 'vec');
+    var sizeLoc = gl.getUniformLocation(program, 'size');
+    var size = 0.2;
     var thetaT = [20, 60, 0];
+    var vec = [0, 0, 0];
+    var vecX = 0.0067;
+    var vecY = 0.0076;
+    var vecZ = 0.011;
+    var nrp = 0.67;
   
     //For Cube
     var thetaLocCube = gl.getUniformLocation(programCube, 'theta');
     var thetaCube = [20, 60, 0];
-
 
     function cube(){
       gl.useProgram(programCube);
@@ -103,7 +110,7 @@
 
         -0.2, -0.5,   1.0,1.0,0.0,
         -0.15, -0.7,  1.0,1.0,0.0,
-        -0.1, -0.5,    1.0,1.0,0.0,
+        -0.1, -0.5,   1.0,1.0,0.0,
 
         -0.24, -0.7,  1.0,1.0,0.0,
         -0.2, -0.5,   1.0,1.0,0.0,
@@ -131,11 +138,34 @@
       gl.vertexAttribPointer(
         vColor, 3, gl.FLOAT, gl.FALSE, 5 * Float32Array.BYTES_PER_ELEMENT, 2 * Float32Array.BYTES_PER_ELEMENT
       );
-  
+
+      gl.uniform1f(sizeLoc, size);
+
+      //Hit the Wall
+
+      if(vec[0] > 0.5*(1-size) || vec[0] < -0.5*(1-size) ){
+        vecX = vecX * -1;
+      }
+      vec[0] += vecX;
+
+      if(vec[1] > 0.5*(1-size) || vec[1] < -0.5*(1-size) ){
+        vecY = vecY * -1;
+      }
+      vec[1] += vecY;
+
+      if(vec[2] > 0.5*(1-size) || vec[2] < -0.5*(1-size) ){
+        vecZ = vecZ * -1;
+      }
+      vec[2] += vecZ;
+
+      gl.uniform3fv(transLoc, vec);
+
       // gl.enableVertexAttribArray(vPosition);
       // gl.enableVertexAttribArray(vColor);
 
-      thetaT[1] += 0.67;
+      //Y Rotation
+
+      thetaT[1] += ( nrp * 3 );
 
       gl.uniform3fv(thetaLoc, thetaT);
     }
